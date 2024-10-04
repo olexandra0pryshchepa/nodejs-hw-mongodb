@@ -1,53 +1,37 @@
-const express = require('express');
-const cors = require('cors');
-const pino = require('pino-http');
-const { getAllContacts, getContactById } = require('./services/contacts');
+import express from 'express';
+import { getAllContacts, getContactById } from './services/contacts.js';
 
 const setupServer = () => {
   const app = express();
+  const PORT = process.env.PORT || 3000;
 
-  app.use(cors());
-  app.use(pino());
+  app.use(express.json());
 
   app.get('/contacts', async (req, res) => {
     try {
       const contacts = await getAllContacts();
-      res.status(200).json({
-        status: 200,
-        message: 'Successfully found contacts!',
-        data: contacts,
-      });
+      res.json(contacts);
     } catch (error) {
-      console.error('Error fetching contacts:', error); 
-      res.status(500).json({ message: 'Error fetching contacts' });
+      res.status(500).json({ message: "Error fetching contacts", error: error.message });
     }
   });
 
-  app.get('/contacts/:contactId', async (req, res) => {
+  app.get('/contacts/:id', async (req, res) => {
+    const contactId = req.params.id;
     try {
-      const contact = await getContactById(req.params.contactId);
+      const contact = await getContactById(contactId);
       if (!contact) {
-        return res.status(404).json({ message: 'Contact not found' });
+        return res.status(404).json({ message: "Contact not found" });
       }
-      res.status(200).json({
-        status: 200,
-        message: `Successfully found contact with id ${req.params.contactId}!`,
-        data: contact,
-      });
+      res.json(contact);
     } catch (error) {
-      console.error('Error fetching contact:', error);
-      res.status(500).json({ message: 'Error fetching contact' });
+      res.status(500).json({ message: "Error fetching contact", error: error.message });
     }
   });
 
-  app.use((req, res, next) => {
-    res.status(404).json({ message: 'Not found' });
-  });
-
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
   });
 };
 
-module.exports = setupServer;
+export default setupServer;
