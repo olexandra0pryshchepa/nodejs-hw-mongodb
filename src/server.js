@@ -22,7 +22,7 @@ const setupServer = () => {
   }
 });
 
-   app.get('/contacts/:id', async (req, res) => {
+   app.get('/contacts/:contactId', async (req, res) => {
     const contactId = req.params.id;
     try {
       const contact = await getContactById(contactId);
