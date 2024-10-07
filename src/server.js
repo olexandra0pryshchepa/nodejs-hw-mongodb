@@ -1,4 +1,5 @@
 import express from 'express';
+import { ObjectId } from 'mongodb';
 import { getAllContacts, getContactById } from './services/contacts.js';
 
 const setupServer = () => {
@@ -22,10 +23,10 @@ const setupServer = () => {
   }
 });
 
-   app.get('/contacts/:contactId', async (req, res) => {
+   app.get('/contacts/:id', async (req, res) => {
     const contactId = req.params.id;
     try {
-      const contact = await getContactById(contactId);
+       const contact = await getContactById(ObjectId(contactId));
       if (!contact) {
         return res.status(404).json({
           status: 404,
